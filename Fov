@@ -1,0 +1,30 @@
+-- Slider Logic
+Slider.MouseButton1Down:Connect(function()
+    dragging = true
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        -- Calculate the mouse position relative to the slider bar
+        local mouseX = input.Position.X
+        local sliderBarX = SliderBar.AbsolutePosition.X
+        local sliderBarWidth = SliderBar.AbsoluteSize.X
+        
+        -- Clamp the slider position within the slider bar
+        local position = math.clamp((mouseX - sliderBarX) / sliderBarWidth, 0, 1)
+        
+        -- Update slider position along the X-axis (confined within the slider bar)
+        Slider.Position = UDim2.new(position, -Slider.Size.X.Offset / 2, -0.5, -Slider.Size.Y.Offset / 2)
+        
+        -- Update FOV based on the slider's position
+        local fov = math.floor(70 + (position * 50)) -- FOV ranges from 70 to 120
+        FovLabel.Text = "FOV: " .. fov
+        workspace.CurrentCamera.FieldOfView = fov
+    end
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
